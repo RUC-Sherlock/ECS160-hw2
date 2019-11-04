@@ -15,10 +15,9 @@ import ecs160.visitor.utilities.UtilReader;
 public class SingletonCheckerVisitor extends ASTVisitor {
 	//assume field declarations come before any method declarations in any files you are testing
 	//TODO:check the mutability problem
-	//TODO:how does SingletonChekcer get instantiated?
-	
+	//how does SingletonChekcer get instantiated?
+	//answer: default value is null, same as instance variable
 	private class InstCreateCheckerVisitor extends ASTVisitor{
-		//TODO: imitate ifPrinter?
 		private boolean inIf = false;
 		private boolean hasCreated = false;
 		//this flag indicates whether the constructor be called more than once

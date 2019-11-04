@@ -14,19 +14,27 @@ import ecs160.visitor.utilities.UtilReader;
 
 public class StateCheckerVisitor extends ASTVisitor {
 	private class CallCheckerVisitor extends ASTVisitor {
-		private String _targetClassName = null;
+		private String _targetVarName = null;
 		private String _methodName = null;
 		private boolean _hasCalled = false;
 		
-		public CallCheckerVisitor(String targetClassName, String methodName) {
-			this._targetClassName = targetClassName;
+		public CallCheckerVisitor(String targetVarName, String methodName) {
+			this._targetVarName = targetVarName;
 			this._methodName = methodName;
 		}
 		
 		public boolean visit(MethodInvocation miv) {
 			String methodName = miv.getName().toString();
 			if(this._methodName.equals(methodName)) {
-				this._hasCalled = true;
+				Expression expr = miv.getExpression();
+				//the correct type of expression should be SimpleName
+				if(expr instanceof SimpleName) {
+					SimpleName name = (SimpleName)expr;
+					if(name.toString().equals(this._targetVarName)) {
+						
+						this._hasCalled = true;
+					}
+				}
 			}
 			
 			return true;
@@ -115,6 +123,18 @@ public class StateCheckerVisitor extends ASTVisitor {
 		}
 		else if(name.equals(this._contextName)){
 			MethodDeclaration[] mds = td.getMethods();
+			FieldDeclaration[] fds = td.getFields();
+			String targetVarName = null;
+			for(FieldDeclaration fd: fds) {
+				Type type = fd.getType();
+				if(type instanceof SimpleType) {
+					String typeName = ((SimpleType)type).getName().toString();
+					if(typeName.equals(this._abstractName)) {
+						targetVarName =  ((VariableDeclarationFragment) fd.fragments().get(0)).getName().toString();
+						System.out.println(targetVarName);
+					}
+				}
+			}
 			//first check A_flag
 			HashSet<String> contextMethods = new HashSet<String>();
 			for(MethodDeclaration md: mds) {
@@ -130,23 +150,24 @@ public class StateCheckerVisitor extends ASTVisitor {
 				this.A_flag = false;
 			}
 			
-			for(MethodDeclaration md: mds) {
-				if(contextMethods.contains(md.getName().toString())) {
-					//just search within the intersection
-					boolean hasCalled = this.callCheck(md, this._abstractName);
-					if(hasCalled == true) {
-						this.B_answer ++;
+			if(targetVarName != null) {
+				for(MethodDeclaration md: mds) {
+					if(contextMethods.contains(md.getName().toString())) {
+						//just search within the intersection
+						boolean hasCalled = this.callCheck(md, targetVarName);
+						if(hasCalled == true) {
+							this.B_answer ++;
+						}
 					}
 				}
 			}
 		}
-		
 		return false;
 	}
 	
-	private boolean callCheck(MethodDeclaration md, String targetClassName) {
+	private boolean callCheck(MethodDeclaration md, String targetVarName) {
 		//first initialize the singleton
-		CallCheckerVisitor visitor = new CallCheckerVisitor(targetClassName, md.getName().toString());
+		CallCheckerVisitor visitor = new CallCheckerVisitor(targetVarName, md.getName().toString());
 		md.accept(visitor);
 		return visitor.hasCalled();
 	}

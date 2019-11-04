@@ -9,7 +9,6 @@ import ecs160.visitor.astvisitors.SingletonCheckerVisitor;
 import ecs160.visitor.astvisitors.StateCheckerVisitor;
 
 public class TestHW2 {
-	//TODO:why could it be declared here?
 	public static SingletonCheckerVisitor q1Grader;
 	public static StateCheckerVisitor q2Grader;
 
@@ -42,8 +41,8 @@ public class TestHW2 {
 		q2Grader = StateCheckerVisitor.setUpGrader("../ECS160HW1Fall2019/src/hw1/LibraryBook.java",
 				"LibraryBook",
 				"../ECS160HW1Fall2019/src/hw1/LBState.java", "LBState");
-		//System.out.println(q1Grader);
-		// System.out.println(q2Grader);
+		System.out.println(q1Grader);
+		System.out.println(q2Grader);
 	}
 
 	
